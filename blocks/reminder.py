@@ -147,3 +147,49 @@ def remind_start_message_block(consts: str, selected_users_name: list, start_dat
             ]
         }
     ]
+
+def remind_alarm_message_block(consts: str, selected_users_slack_key: list):
+    return [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": ":bell: 리마인드가 도착했어요",
+				"emoji": True
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": f"```{consts}```"
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": " ".join(f"<@{slack_key}>" for slack_key in selected_users_slack_key)
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "작업을 완료했으면 버튼을 클릭해주세요 :point_right::skin-tone-2:"
+			},
+			"accessory": {
+				"type": "button",
+				"text": {
+					"type": "plain_text",
+					"text": "작업 완료",
+					"emoji": True
+				},
+				"style": "primary",
+				"action_id": "remind_confirm"
+			}
+		}
+	]
