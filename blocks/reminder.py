@@ -193,3 +193,31 @@ def remind_alarm_message_block(consts: str, selected_users_slack_key: list):
 			}
 		}
 	]
+
+def remind_complete_message_block():
+    return [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": ":tada: 작업이 완료됐어요",
+				"emoji": True
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*모든 담당자가 작업을 완료했어요.*\n리마인드는 여기서 종료됩니다 🙌"
+			}
+		},
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "mrkdwn",
+					"text": ":man-bowing::skin-tone-2: 필요하면 언제든 새로운 리마인드를 만들어주세요"
+				}
+			]
+		}
+	]
