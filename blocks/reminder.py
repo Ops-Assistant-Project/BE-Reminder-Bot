@@ -221,3 +221,22 @@ def remind_complete_message_block():
 			]
 		}
 	]
+
+def remind_end_message_block():
+    return [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "📌 리마인드가 종료됐어요",
+				"emoji": True
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "설정된 *리마인드 기간이 종료* 되어 알림이 중단됐어요\n필요하다면 새로운 리마인드를 다시 생성해주세요."
+			}
+		}
+	]
