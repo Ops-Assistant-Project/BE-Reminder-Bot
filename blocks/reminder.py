@@ -93,3 +93,57 @@ def create_reminder_modal_view(channel_id: str, message_ts: str):
             }
         ]
     }
+
+def remind_start_message_block(consts: str, selected_users_name: list, start_date: str, end_date: str):
+    return [
+        {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": ":wave::skin-tone-2: 리마인드가 생성되었어요",
+                "emoji": True
+            }
+        },
+        {
+            "type": "divider"
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"```{consts}```"
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"*담당자*: {', '.join(selected_users_name)}"
+            }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"*리마인드 기간*: {start_date} ~ {end_date}"
+            }
+        },
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "mrkdwn",
+                    "text": "⚠️ 리마인드 기간동안 매일 오전 10시에 담당자를 언급해요"
+                }
+            ]
+        },
+        {
+            "type": "context",
+            "elements": [
+                {
+                    "type": "mrkdwn",
+                    "text": "⚠️ 작업을 완료한 담당자는 리마인드에서 제외돼요"
+                }
+            ]
+        }
+    ]
