@@ -1,4 +1,3 @@
-import json
 from handlers import ReminderHandler
 
 
@@ -15,3 +14,17 @@ def create_reminder(ack, body, client):
 
     handlers = ReminderHandler(client=client)
     return handlers.create_reminder(body)
+
+# @slack_app.shortcut("DELETE_REMINDER")
+def open_delete_reminder_shortcut(ack, body, client):
+    ack()
+
+    handlers = ReminderHandler(client=client)
+    return handlers.open_delete_reminder_shortcut(body)
+
+# @slack_app.view("reminder_delete_submit")
+def delete_reminder(ack, body, client):
+    ack()
+
+    handlers = ReminderHandler(client=client)
+    return handlers.delete_reminder(body)

@@ -2,8 +2,8 @@ import json
 from datetime import date, datetime
 from slack_sdk.errors import SlackApiError
 from models.reminder import Reminder, ReminderStatus
-from blocks.reminder import create_reminder_modal_view, remind_start_message_block
-from common.slack_blocks import get_mrkdwn_block, get_header_block
+from blocks.reminder import create_reminder_modal_view, remind_start_message_block, delete_reminder_modal_view
+from common.slack_blocks import get_mrkdwn_block, get_header_block, get_divider_block, get_context_block
 
 class ReminderHandler():
     def __init__(self, client):
@@ -85,3 +85,52 @@ class ReminderHandler():
             return ReminderStatus.ACTIVE
 
         return ReminderStatus.DONE
+
+    def open_delete_reminder_shortcut(self, body):
+        channel_id = body.get("channel", {}).get("id", "")
+        message_ts = body.get("message", {}).get("ts", "")
+
+        self.client.views_open(
+            trigger_id=body.get("trigger_id"),
+            view=delete_reminder_modal_view(channel_id, message_ts)
+        )
+
+    def delete_reminder(self, body):
+        metadata = json.loads(body.get("view", {}).get("private_metadata", ''))
+        channel_id = metadata.get("channel_id", "")
+        message_ts = metadata.get("message_ts", "")
+
+        remind = Reminder.objects(
+            channel_id=channel_id,
+            message_ts=message_ts,
+            status__in=["PENDING", "ACTIVE"]
+        ).first()
+
+        if not remind:
+            self.client.chat_postEphemeral(
+                channel=channel_id,
+                thread_ts=message_ts,
+                user=body.get('user', {}).get('id', ''),
+                blocks=[get_mrkdwn_block(":dotted_line_face: 삭제할 리마인드가 없어요")]
+            )
+            return
+
+        remind.status = ReminderStatus.DONE
+        remind.save()
+
+        self.client.chat_postMessage(
+            channel=channel_id,
+            text="리마인드 삭제 완료",
+            thread_ts=message_ts,
+            blocks=[
+                get_header_block(f":wastebasket: 리마인드가 삭제됐어요"),
+                get_divider_block(),
+                get_mrkdwn_block(f"```{remind.consts}```"),
+                get_context_block([
+                    {
+                        "type": "mrkdwn",
+                        "text": "️:no_entry: 리마인드가 삭제되어 더 이상 알림이 가지 않아요"
+                    }
+                ])
+            ]
+        )

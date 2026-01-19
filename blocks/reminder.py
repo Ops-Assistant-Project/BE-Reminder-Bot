@@ -241,3 +241,51 @@ def remind_end_message_block():
 			}
 		}
 	]
+
+def delete_reminder_modal_view(channel_id: str, message_ts: str):
+    return {
+        "type": "modal",
+        "callback_id": "reminder_delete_submit",
+        "private_metadata": json.dumps({
+            "channel_id": channel_id,
+            "message_ts": message_ts
+        }),
+        "title": {
+            "type": "plain_text",
+            "text": "⚠️ 리마인드 삭제",
+            "emoji": True
+        },
+        "submit": {
+            "type": "plain_text",
+            "text": "삭제"
+        },
+        "close": {
+            "type": "plain_text",
+            "text": "취소"
+        },
+        "blocks": [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*정말로 이 리마인드를 삭제할까요?*"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "삭제하면 해당 리마인드는 즉시 종료되며,\n담당자에게 더 이상 알림이 전송되지 않아요"
+                }
+            },
+            {
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "mrkdwn",
+                        "text": "❗ *이 작업은 되돌릴 수 없어요*"
+                    }
+                ]
+            }
+        ]
+    }
