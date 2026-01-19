@@ -112,7 +112,16 @@ class ReminderHandler():
                 channel=channel_id,
                 thread_ts=message_ts,
                 user=body.get('user', {}).get('id', ''),
-                blocks=[get_mrkdwn_block(":dotted_line_face: 삭제할 리마인드가 없어요")]
+                text="리마인드 삭제 오류",
+                blocks=[
+                    get_mrkdwn_block(":dotted_line_face: 삭제할 리마인드가 없어요"),
+                    get_context_block([
+                        {
+                            "type": "mrkdwn",
+                            "text": "️:warning: 진행 예정이거나 진행 중인 리마인드만 삭제할 수 있어요"
+                        }
+                    ])
+                ]
             )
             return
 
