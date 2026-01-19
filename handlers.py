@@ -1,8 +1,9 @@
 import json
-from datetime import date, datetime, timezone, timedelta
+from bson import ObjectId
+from datetime import date, datetime
 from slack_sdk.errors import SlackApiError
 from models.reminder import Reminder, ReminderStatus
-from blocks.reminder import create_reminder_modal_view, remind_start_message_block, delete_reminder_modal_view, remind_alarm_message_block
+from blocks.reminder import *
 from common.slack_blocks import get_mrkdwn_block, get_header_block, get_divider_block, get_context_block
 
 class ReminderHandler():
@@ -135,7 +136,7 @@ class ReminderHandler():
             ]
         )
 
-    def send_reminder_message(self, body):
+    def send_reminder_message(self):
         today = datetime.now().date()
         reminders = Reminder.objects(status__in=["PENDING", "ACTIVE"])
 
@@ -147,12 +148,12 @@ class ReminderHandler():
                     channel=reminder.channel_id,
                     text="리마인드 알림 도착",
                     thread_ts=reminder.message_ts,
-                    blocks=remind_alarm_message_block(consts=reminder.consts, selected_users_slack_key=alarm_user_list)
+                    blocks=remind_alarm_message_block(consts=reminder.consts, selected_users_slack_key=alarm_user_list, reminder_id=str(reminder.id))
                 )
 
                 reminder.last_triggered_at = today
                 if today >= reminder.end_date.date():
-                    reminder.status = ReminderStatus.DONE
+                    # reminder.status = ReminderStatus.DONE
 
                     # 종료 예정 메시지 전송
                     self.client.chat_postMessage(
@@ -172,9 +173,31 @@ class ReminderHandler():
 
                 reminder.save()
 
-    @staticmethod
-    def _get_today_kst():
-        return (datetime.now(timezone.utc) + timedelta(hours=9))
-
     def confirm_reminder(self, body):
-        print(body)
+        user_slack_id = body.get("user", {}).get("id", "")
+        reminder_id = body.get("actions", [])[0].get("value", "")
+
+        reminder = Reminder.objects(id=ObjectId(reminder_id), status__in=["PENDING", "ACTIVE"]).first()
+
+        if not reminder:
+            return
+
+        old_completed_users = reminder.completed_users
+        remain_users = list(set(reminder.selected_users) - set(old_completed_users))
+
+        if user_slack_id not in remain_users:
+            return
+
+        old_completed_users.append(user_slack_id)
+        reminder.completed_users = old_completed_users
+
+        if len(remain_users) == 1:
+            self.client.chat_postMessage(
+                channel=reminder.channel_id,
+                thread_ts=reminder.message_ts,
+                text="모든 담당자 작업 완료",
+                blocks=remind_complete_message_block()
+            )
+            reminder.status = ReminderStatus.DONE
+
+        reminder.save()

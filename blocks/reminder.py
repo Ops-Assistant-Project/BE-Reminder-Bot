@@ -149,7 +149,7 @@ def remind_start_message_block(consts: str, selected_users_name: list, start_dat
         }
     ]
 
-def remind_alarm_message_block(consts: str, selected_users_slack_key: list):
+def remind_alarm_message_block(consts: str, selected_users_slack_key: list, reminder_id: str):
     return [
 		{
 			"type": "header",
@@ -190,7 +190,8 @@ def remind_alarm_message_block(consts: str, selected_users_slack_key: list):
 					"emoji": True
 				},
 				"style": "primary",
-				"action_id": "remind_confirm"
+				"action_id": "remind_confirm",
+                "value": reminder_id
 			}
 		}
 	]
