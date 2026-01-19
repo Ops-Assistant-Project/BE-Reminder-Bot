@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 
 def create_reminder_modal_view(channel_id: str, message_ts: str):
@@ -94,7 +95,7 @@ def create_reminder_modal_view(channel_id: str, message_ts: str):
         ]
     }
 
-def remind_start_message_block(consts: str, selected_users_name: list, start_date: str, end_date: str):
+def remind_start_message_block(consts: str, selected_users_name: list, start_date: date, end_date: date):
     return [
         {
             "type": "header",
