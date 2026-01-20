@@ -336,6 +336,9 @@ def reminder_progress_modal_view(consts: str, selected_users: list, completed_us
 
     progress_bar = "▮" * filled + "▯" * empty
 
+    # 진행 중인 담당자
+    remaining_users = list(set(selected_users) - set(completed_users))
+
     return {
         "type": "modal",
         "callback_id": "reminder_progress_view",
@@ -380,7 +383,7 @@ def reminder_progress_modal_view(consts: str, selected_users: list, completed_us
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": " ".join(f"<@{slack_key}>" for slack_key in selected_users) if selected_users else ":X:"
+                    "text": " ".join(f"<@{slack_key}>" for slack_key in remaining_users) if remaining_users else ":X:"
                 }
             },
             {
