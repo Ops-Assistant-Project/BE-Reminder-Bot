@@ -47,9 +47,6 @@ class ReminderHandler():
         if end_date < today:
             error_messages.append("종료일은 오늘 이후로 선택해주세요")
 
-        if start_date < today:
-            error_messages.append("시작일은 오늘 이후로 선택해주세요")
-
         # 검증 실패 시 함수 종료
         if error_messages:
             self.client.chat_postMessage(
@@ -225,3 +222,27 @@ class ReminderHandler():
             reminder.status = ReminderStatus.DONE
 
         reminder.save()
+
+        self.client.chat_postEphemeral(
+            channel=reminder.channel_id,
+            thread_ts=reminder.message_ts,
+            user=user_slack_id,
+            text="작업 완료",
+            blocks=[
+                get_mrkdwn_block("작업이 완료되었어요 고생하셨어요! :raised_hands::skin-tone-2:"),
+            ]
+        )
+
+    def open_progress_reminder_shortcut(self, body):
+        channel_id = body.get("channel", {}).get("id", "")
+        message_ts = body.get("message", {}).get("ts", "")
+
+        reminder = Reminder.objects(channel_id=channel_id, message_ts=message_ts).order_by("-created_at").first()
+
+        if not reminder:
+            return
+
+        self.client.views_open(
+            trigger_id=body.get("trigger_id"),
+            view=reminder_progress_modal_view(consts=reminder.consts, selected_users=reminder.selected_users, completed_users=reminder.completed_users)
+        )

@@ -1,4 +1,5 @@
 from enum import Enum
+from datetime import datetime
 from mongoengine import (
     Document,
     StringField,
@@ -26,3 +27,4 @@ class Reminder(Document):
     channel_id = StringField()
     message_ts = StringField()
 
+    created_at = DateTimeField(default=datetime.utcnow)

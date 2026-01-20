@@ -41,3 +41,9 @@ def confirm_reminder(ack, body, client):
 
     handlers = ReminderHandler(client=client)
     return handlers.confirm_reminder(body)
+
+def open_progress_reminder_shortcut(ack, body, client):
+    ack()
+
+    handlers = ReminderHandler(client=client)
+    return handlers.open_progress_reminder_shortcut(body)

@@ -1,8 +1,10 @@
 import json
-from datetime import date
+from datetime import date, datetime
 
 
 def create_reminder_modal_view(channel_id: str, message_ts: str):
+    today_str = date.today().isoformat()
+
     return {
         "type": "modal",
         "callback_id": "reminder_create_submit",
@@ -36,6 +38,7 @@ def create_reminder_modal_view(channel_id: str, message_ts: str):
                 "element": {
                     "type": "datepicker",
                     "action_id": "start_date",
+                    "initial_date": today_str,
                     "placeholder": {
                         "type": "plain_text",
                         "text": "시작일 선택"
@@ -320,3 +323,82 @@ def reminder_error_message_block(error_messages: list):
 			}
 		}
 	]
+
+def reminder_progress_modal_view(consts: str, selected_users: list, completed_users: list):
+    # 진행 계산
+    total = len(selected_users)
+    completed = len(completed_users)
+    progress_percent = int((completed / total) * 100) if total > 0 else 0
+
+    bar_total = 10
+    filled = round(progress_percent / 10)
+    empty = bar_total - filled
+
+    progress_bar = "▮" * filled + "▯" * empty
+
+    return {
+        "type": "modal",
+        "callback_id": "reminder_progress_view",
+        "title": {
+            "type": "plain_text",
+            "text": "리마인드 진행 상황",
+            "emoji": True
+        },
+        "close": {
+            "type": "plain_text",
+            "text": "닫기"
+        },
+        "blocks": [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"```{consts}```"
+                }
+            },
+            {
+                "type": "divider"
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*전체* {total}명  ·  *완료* {completed}명  ·  *진행* {progress_percent}%  {progress_bar}"
+                }
+            },
+            {
+                "type": "divider"
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": ":fire: *진행중*"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": " ".join(f"<@{slack_key}>" for slack_key in selected_users) if selected_users else ":X:"
+                }
+            },
+            {
+                "type": "divider"
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": ":+1::skin-tone-2: *완료*"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": " ".join(f"<@{slack_key}>" for slack_key in completed_users) if completed_users else ":X:"
+                }
+            }
+        ]
+    }
