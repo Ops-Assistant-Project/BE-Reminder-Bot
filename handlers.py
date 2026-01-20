@@ -174,8 +174,6 @@ class ReminderHandler():
 
                 reminder.last_triggered_at = today
                 if today >= reminder.end_date.date():
-                    # reminder.status = ReminderStatus.DONE
-
                     # 종료 예정 메시지 전송
                     self.client.chat_postMessage(
                         channel=reminder.channel_id,
@@ -191,6 +189,14 @@ class ReminderHandler():
                                 "text": ":bulb: 아직 작업을 완료하지 못한 담당자분들은 작업 완료를 눌러주세요"
                             }])
                         ])
+            else:
+                self.client.chat_postMessage(
+                    channel=reminder.channel_id,
+                    text="리마인드 종료",
+                    thread_ts=reminder.message_ts,
+                    blocks=remind_end_message_block()
+                )
+                reminder.status = ReminderStatus.DONE
 
                 reminder.save()
 
