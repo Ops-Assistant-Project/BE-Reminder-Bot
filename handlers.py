@@ -206,6 +206,18 @@ class ReminderHandler():
         old_completed_users = reminder.completed_users
         remain_users = list(set(reminder.selected_users) - set(old_completed_users))
 
+        if user_slack_id in old_completed_users:
+            self.client.chat_postEphemeral(
+                channel=reminder.channel_id,
+                thread_ts=reminder.message_ts,
+                user=user_slack_id,
+                text="작업 완료",
+                blocks=[
+                    get_mrkdwn_block("이미 작업을 완료했어요! :heart_hands::skin-tone-2:"),
+                ]
+            )
+            return
+
         if user_slack_id not in remain_users:
             return
 
