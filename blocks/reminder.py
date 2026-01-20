@@ -28,25 +28,6 @@ def create_reminder_modal_view(channel_id: str, message_ts: str):
         "blocks": [
             {
                 "type": "input",
-                "block_id": "users_block",
-                "element": {
-                    "type": "multi_users_select",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "담당자를 선택하세요",
-                        "emoji": True
-                    },
-                    "action_id": "users_select_action"
-                },
-                "label": {
-                    "type": "plain_text",
-                    "text": "담당자 선택",
-                    "emoji": True
-                },
-                "optional": False
-            },
-            {
-                "type": "input",
                 "block_id": "start_date_block",
                 "label": {
                     "type": "plain_text",
@@ -76,6 +57,25 @@ def create_reminder_modal_view(channel_id: str, message_ts: str):
                         "text": "종료 날짜 선택"
                     }
                 }
+            },
+            {
+                "type": "input",
+                "block_id": "users_block",
+                "element": {
+                    "type": "multi_users_select",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "담당자를 선택하세요",
+                        "emoji": True
+                    },
+                    "action_id": "users_select_action"
+                },
+                "label": {
+                    "type": "plain_text",
+                    "text": "담당자 선택",
+                    "emoji": True
+                },
+                "optional": False
             },
             {
                 "type": "input",
