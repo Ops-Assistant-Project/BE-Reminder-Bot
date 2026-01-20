@@ -37,12 +37,27 @@ class ReminderHandler():
         start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
         end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
 
+        error_messages = []
+        today = date.today()
+
+        # 입력한 값 검증
         if start_date >= end_date:
-            return self.client.chat_postMessage(
+            error_messages.append("시작일은 종료일보다 이전이어야 해요")
+
+        if end_date < today:
+            error_messages.append("종료일은 오늘 이후로 선택해주세요")
+
+        if start_date < today:
+            error_messages.append("시작일은 오늘 이후로 선택해주세요")
+
+        # 검증 실패 시 함수 종료
+        if error_messages:
+            self.client.chat_postMessage(
                 channel=admin_slack_id,
                 text="리마인드 생성 오류 발생",
-                blocks=[get_header_block(":warning: 리마인드 생성 오류가 발생했어요")]
+                blocks=reminder_error_message_block(error_messages)
             )
+            return
 
         # DB 저장
         remind = Reminder(

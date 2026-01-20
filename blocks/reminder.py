@@ -38,7 +38,7 @@ def create_reminder_modal_view(channel_id: str, message_ts: str):
                     "action_id": "start_date",
                     "placeholder": {
                         "type": "plain_text",
-                        "text": "시작 날짜 선택"
+                        "text": "시작일 선택"
                     }
                 }
             },
@@ -54,7 +54,7 @@ def create_reminder_modal_view(channel_id: str, message_ts: str):
                     "action_id": "end_date",
                     "placeholder": {
                         "type": "plain_text",
-                        "text": "종료 날짜 선택"
+                        "text": "종료일 선택"
                     }
                 }
             },
@@ -290,3 +290,33 @@ def delete_reminder_modal_view(channel_id: str, message_ts: str):
             }
         ]
     }
+
+def reminder_error_message_block(error_messages: list):
+    msg = '\n'.join(error_messages)
+    return [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "⚠️ 리마인드 생성 중 문제가 발생했어요",
+				"emoji": True
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "입력하신 정보 중 확인이 필요한 항목이 있어요 \n아래 내용을 확인하고 다시 시도해주세요 🙏"
+			}
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": f"```{msg}```"
+			}
+		}
+	]
