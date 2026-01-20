@@ -223,6 +223,37 @@ class ReminderHandler():
 
         reminder.save()
 
+        # 기존 메시지에서 완료한 담당자 언급 제외
+        history = self.client.conversations_replies(
+            channel=reminder.channel_id,
+            ts=reminder.message_ts
+        )
+
+        messages = history.get("messages", [])
+        for message in messages:
+            if message.get("text") == "리마인드 알림 도착":
+                message_blocks = message.get("blocks", [])
+                message_reminder_id = message_blocks[-1].get("accessory", {}).get("value")
+
+                if reminder_id == message_reminder_id:
+                    user_info = self.client.users_info(user=user_slack_id)
+
+                    if not user_info:
+                        return
+
+                    text = message_blocks[3].get("text", {}).get("text", "")
+                    text = text.replace(f"<@{user_slack_id}>", f"~{user_info.get('user', {}).get('real_name', '')}~")
+
+                    message_blocks[3]["text"]["text"] = text
+
+                    self.client.chat_update(
+                        channel=reminder.channel_id,
+                        ts=message.get("ts"),
+                        text="리마인드 알림 도착",
+                        blocks=message_blocks
+                    )
+
+        # 작업 완료 비밀 메시지 전송
         self.client.chat_postEphemeral(
             channel=reminder.channel_id,
             thread_ts=reminder.message_ts,
