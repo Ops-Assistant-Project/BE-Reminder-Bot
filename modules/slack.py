@@ -1,6 +1,6 @@
 from slack_bolt import App
 from common.crypto import decrypt
-from common.slack import SlackEnvKey
+from common.slack.config import SlackEnvKey
 
 
 class BoltApp:

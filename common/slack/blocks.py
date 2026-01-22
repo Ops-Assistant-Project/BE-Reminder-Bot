@@ -1,3 +1,4 @@
+# 재사용 Slack Block Kit
 from typing import List
 
 def get_mrkdwn_block(text: str, block_id: str = None) -> dict:
