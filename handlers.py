@@ -82,23 +82,6 @@ class ReminderHandler():
             blocks=remind_start_message_block(consts=consts, start_date=start_date, end_date=end_date, selected_users_name=users_name)
         )
 
-    def _calculate_reminder_status(
-            self,
-            start_date: date,
-            end_date: date,
-            today: date | None = None,
-    ) -> ReminderStatus:
-        if today is None:
-            today = date.today()
-
-        if today < start_date:
-            return ReminderStatus.PENDING
-
-        if start_date <= today <= end_date:
-            return ReminderStatus.ACTIVE
-
-        return ReminderStatus.DONE
-
     def open_delete_reminder_shortcut(self, body):
         channel_id = body.get("channel", {}).get("id", "")
         message_ts = body.get("message", {}).get("ts", "")
@@ -156,49 +139,6 @@ class ReminderHandler():
                 ])
             ]
         )
-
-    def send_reminder_message(self):
-        today = datetime.now().date()
-        reminders = Reminder.objects(status__in=["PENDING", "ACTIVE"])
-
-        for reminder in reminders:
-            if reminder.start_date.date() <= today <= reminder.end_date.date():
-                alarm_user_list = list(set(reminder.selected_users) - set(reminder.completed_users))
-                # 알림 전송
-                self.client.chat_postMessage(
-                    channel=reminder.channel_id,
-                    text="리마인드 알림 도착",
-                    thread_ts=reminder.message_ts,
-                    blocks=remind_alarm_message_block(consts=reminder.consts, selected_users_slack_key=alarm_user_list, reminder_id=str(reminder.id))
-                )
-
-                reminder.last_triggered_at = today
-                if today >= reminder.end_date.date():
-                    # 종료 예정 메시지 전송
-                    self.client.chat_postMessage(
-                        channel=reminder.channel_id,
-                        text="리마인드 종료 예정",
-                        thread_ts=reminder.message_ts,
-                        blocks=[get_context_block([
-                            {
-                                "type": "mrkdwn",
-                                "text": ":bulb: 오늘이 리마인드 마지막 날이에요"
-                            },
-                            {
-                                "type": "mrkdwn",
-                                "text": ":bulb: 아직 작업을 완료하지 못한 담당자분들은 작업 완료를 눌러주세요"
-                            }])
-                        ])
-            else:
-                self.client.chat_postMessage(
-                    channel=reminder.channel_id,
-                    text="리마인드 종료",
-                    thread_ts=reminder.message_ts,
-                    blocks=remind_end_message_block()
-                )
-                reminder.status = ReminderStatus.DONE
-
-                reminder.save()
 
     def confirm_reminder(self, body):
         user_slack_id = body.get("user", {}).get("id", "")
@@ -295,3 +235,20 @@ class ReminderHandler():
             trigger_id=body.get("trigger_id"),
             view=reminder_progress_modal_view(consts=reminder.consts, selected_users=reminder.selected_users, completed_users=reminder.completed_users)
         )
+
+    @staticmethod
+    def _calculate_reminder_status(
+            start_date: date,
+            end_date: date,
+            today: date | None = None,
+    ) -> ReminderStatus:
+        if today is None:
+            today = date.today()
+
+        if today < start_date:
+            return ReminderStatus.PENDING
+
+        if start_date <= today <= end_date:
+            return ReminderStatus.ACTIVE
+
+        return ReminderStatus.DONE

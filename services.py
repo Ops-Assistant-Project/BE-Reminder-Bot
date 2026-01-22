@@ -29,12 +29,6 @@ def delete_reminder(ack, body, client):
     handlers = ReminderHandler(client=client)
     return handlers.delete_reminder(body)
 
-def send_reminder_message(ack, client):
-    ack()
-
-    handlers = ReminderHandler(client=client)
-    return handlers.send_reminder_message()
-
 # @slack_app.action("remind_confirm")
 def confirm_reminder(ack, body, client):
     ack()
