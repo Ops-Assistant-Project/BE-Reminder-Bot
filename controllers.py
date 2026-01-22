@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from slack_bolt.adapter.fastapi import SlackRequestHandler
 from modules.slack import BoltApp
-from common.slack import SlackBotName
+from common.slack.config import SlackBotName
 from services import (open_create_reminder_shortcut, create_reminder,
                       open_delete_reminder_shortcut, delete_reminder,
                       confirm_reminder, open_progress_reminder_shortcut)

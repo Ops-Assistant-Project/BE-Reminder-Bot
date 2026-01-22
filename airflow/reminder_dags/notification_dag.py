@@ -1,11 +1,10 @@
 from datetime import datetime
 from common.crypto import decrypt
-from common.slack import SlackEnvKey, SlackBotName
+from common.slack.config import SlackEnvKey, SlackBotName
 from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
 from models.reminder import Reminder, ReminderStatus
 from blocks.reminder import remind_alarm_message_block, remind_end_message_block
-from common.slack_blocks import get_context_block
+from common.slack.blocks import get_context_block
 
 
 def send_reminder_message():
