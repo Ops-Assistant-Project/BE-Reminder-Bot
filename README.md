@@ -63,7 +63,7 @@
     </td>
   </tr>
 <tr>
-    <td style="padding: 10px;">Extrnal Services</td>
+    <td style="padding: 10px;">External Services</td>
     <td style="padding: 10px;">
         <img src="https://img.shields.io/badge/Notion-FFFFFF?style=flat&logo=notion&logoColor=black"/>
         <img src="https://img.shields.io/badge/Slack-4A154B?style=flat&logo=slack&logoColor=white" />
