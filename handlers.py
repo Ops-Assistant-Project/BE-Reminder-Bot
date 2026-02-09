@@ -118,6 +118,7 @@ class ReminderHandler():
         metadata = json.loads(body.get("view", {}).get("private_metadata", ''))
         channel_id = metadata.get("channel_id", "")
         message_ts = metadata.get("message_ts", "")
+        user_slack_id = body.get("user", {}).get("id", "")
 
         remind = Reminder.objects(
             channel_id=channel_id,
@@ -144,6 +145,27 @@ class ReminderHandler():
                 ]
             )
             return
+
+        if user_slack_id != remind.admin_slack_id:
+            slack_call_safe(
+                self.client.chat_postEphemeral,
+                action="delete_reminder_unauthorized",
+                channel=channel_id,
+                thread_ts=message_ts,
+                user=user_slack_id,
+                text="리마인드 삭제 오류",
+                blocks=[
+                    get_mrkdwn_block(":dotted_line_face: 리마인드를 삭제할 수 없어요"),
+                    get_context_block([
+                        {
+                            "type": "mrkdwn",
+                            "text": ":warning: 생성한 사람만 삭제할 수 있어요"
+                        }
+                    ])
+                ]
+            )
+            return
+
 
         remind.status = ReminderStatus.DONE
         remind.save()
